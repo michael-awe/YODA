@@ -28,16 +28,6 @@ module decoder (clk, rd, dat_in, dat_out, dn, finish, wt, sent, id);
     parameter [1:0] PROCESS = 2'b10; //process mode
     parameter [1:0] SEND = 2'b11; //send mode
 
-    // reading metadata logic (in PROCESS state):
-    //  if size_of_data is 0:
-    //      place the appropriate bits into the appropriate place in size_of_data:
-    //          have a counter tracking which set of bytes we are on
-    //  
-    //  else:
-    //     do the normal thing
-
-
-
     always @ (posedge clk) begin
         case(state) 
             IDLE: begin

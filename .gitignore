@@ -5,3 +5,6 @@ Decoding/decoded_bitstream.txt
 Decoding/reconstructed.wav
 Decoding/waveform.vcd
 Decoding/encoded_bitstream.txt
+Decoding/data_out.txt
+
+Decoding/data_out.txt
