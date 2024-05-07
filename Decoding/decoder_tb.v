@@ -46,7 +46,7 @@ module decoder_tb;
         $display("Starting...");
 
         // opening file in read mode:
-        fdata_in = $fopen("data_in.txt", "r");
+        fdata_in = $fopen("encoded_bitstream.txt", "r");
         #5;
 
         // Check if file opened successfully
@@ -58,7 +58,7 @@ module decoder_tb;
         #5;
 
         // opening file in write mode:
-        fdata_out = $fopen("data_out.txt", "w");
+        fdata_out = $fopen("decoded_bitstream.txt", "w");
         clk=0;
     end
 

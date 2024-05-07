@@ -8,8 +8,11 @@ module decoder (clk, rd, dat_in, dat_out, dn, finish, wt, sent, id);
     reg[7:0] buffer [3:0]; //to store data_in bits
     reg[7:0] ext; //to store extracted bits
     reg[7:0] tail = 0; //tail pointer for buffer
-    reg [7:0] num_bytes = 2; //how much information stored in image, where to stop. Hardcoded for now
-    reg [7:0] done_bytes = 0; //how much data has been extracted already
+    // reg[7:0] size_of_data = 3; //how much information stored in image, where to stop. Hardcoded for now
+    reg[24:0] done_bytes = 0; //how much data has been extracted already
+    
+    reg[24:0] size_of_data = 0; //size of data in bits to be extracted
+    reg[7:0] counter = 0; //counter for size_of_data
 
     reg[1:0] state; //current state
 
@@ -24,6 +27,14 @@ module decoder (clk, rd, dat_in, dat_out, dn, finish, wt, sent, id);
     parameter [1:0] READ = 2'b01; //read mode
     parameter [1:0] PROCESS = 2'b10; //process mode
     parameter [1:0] SEND = 2'b11; //send mode
+
+    // reading metadata logic (in PROCESS state):
+    //  if size_of_data is 0:
+    //      place the appropriate bits into the appropriate place in size_of_data:
+    //          have a counter tracking which set of bytes we are on
+    //  
+    //  else:
+    //     do the normal thing
 
 
 
@@ -42,7 +53,7 @@ module decoder (clk, rd, dat_in, dat_out, dn, finish, wt, sent, id);
 
                     // read in latest data in value
                     buffer[tail] = dat_in;
-                    $display("Data in decoder mod buffer[%b]: %b", tail, buffer[tail]);
+                    // $display("Data in decoder mod buffer[%b]: %b", tail, buffer[tail]);
                     tail = (tail + 1); //% 4;
                     wt=1;
                     #10;
@@ -57,10 +68,28 @@ module decoder (clk, rd, dat_in, dat_out, dn, finish, wt, sent, id);
 
 
             PROCESS: begin //extracting audio data from data_in 
+                tail = 0;
                 id = 1;
-                ext = { buffer[3][1:0], buffer[2][1:0], buffer[1][1:0], buffer[0][1:0] };
-                state = SEND;
-                $display("Processing done.");
+                case (counter)
+                    0: size_of_data[23:16] = { buffer[0][1:0], buffer[1][1:0], buffer[2][1:0], buffer[3][1:0] };
+                    1: size_of_data[15:8] = { buffer[0][1:0], buffer[1][1:0], buffer[2][1:0], buffer[3][1:0] };
+                    2: size_of_data[7:0] = { buffer[0][1:0], buffer[1][1:0], buffer[2][1:0], buffer[3][1:0] };
+                    default: begin
+                        ext = { buffer[0][1:0], buffer[1][1:0], buffer[2][1:0], buffer[3][1:0] };
+                        state = SEND;
+                        $display("Processing done.");
+                        // $finish;
+                    end
+                endcase
+                
+                if (counter < 3) begin
+                    counter = counter + 1;
+
+                    $display("Total length of input @ counter=%d: %b, in bytes=%d", counter, size_of_data, size_of_data/8);
+                    state <= IDLE;
+                    
+                end 
+                
             end
 
             SEND: begin
@@ -73,11 +102,11 @@ module decoder (clk, rd, dat_in, dat_out, dn, finish, wt, sent, id);
                 #10;
 
                 //all bytes extracted:
-                 if (done_bytes == num_bytes) begin
+                 if (done_bytes == size_of_data/8) begin
                     wait(sent);
                     finish = 1;
                 end
-                else if (done_bytes < num_bytes) begin
+                else if (done_bytes < size_of_data/8) begin
                     finish = 0;
                     state = IDLE;
                 end
