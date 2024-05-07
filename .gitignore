@@ -1,2 +1,7 @@
 Decoding/waveform.vcd
 *.vcd
+Decoding/audio_bitstream.txt
+Decoding/decoded_bitstream.txt
+Decoding/reconstructed.wav
+Decoding/waveform.vcd
+Decoding/encoded_bitstream.txt
