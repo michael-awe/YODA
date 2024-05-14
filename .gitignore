@@ -8,3 +8,11 @@ Decoding/encoded_bitstream.txt
 Decoding/data_out.txt
 
 Decoding/data_out.txt
+.DS_Store
+Decoding/data_out.txt
+Decoding/output
+Decoding/waveform.vcd
+Decoding/decoder_pipelining/decoded_bitstream.txt
+Decoding/decoder_pipelining/encoded_bitstream.txt
+Decoding/waveform.vcd
+Decoding/decoder_pipelining/data_out.txt

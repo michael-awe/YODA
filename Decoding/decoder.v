@@ -40,7 +40,6 @@ module decoder (clk, rd, dat_in, dat_out, dn, finish, wt, sent, id);
             READ: begin
                     id = 0;
                     wt = 0;
-
                     // read in latest data in value
                     buffer[tail] = dat_in;
                     // $display("Data in decoder mod buffer[%b]: %b", tail, buffer[tail]);
@@ -55,7 +54,6 @@ module decoder (clk, rd, dat_in, dat_out, dn, finish, wt, sent, id);
                         state = PROCESS;
                     end
                 end
-
 
             PROCESS: begin //extracting audio data from data_in 
                 tail = 0;
@@ -74,10 +72,8 @@ module decoder (clk, rd, dat_in, dat_out, dn, finish, wt, sent, id);
                 
                 if (counter < 3) begin
                     counter = counter + 1;
-
                     $display("Total length of input @ counter=%d: %b, in bytes=%d", counter, size_of_data, size_of_data/8);
                     state <= IDLE;
-                    
                 end 
                 
             end
