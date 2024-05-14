@@ -7,26 +7,27 @@ module decoder_tb;
     parameter CLK_PERIOD = 10; 
     reg clk;
     reg rd;
-    wire dn; 
-    reg [7:0] dat_in;
-    wire [7:0] dat_out;
-    reg sent;
-    wire finish;
-    wire wt;
+    reg [7:0] data_in;
+    wire [7:0] data_out;
+    wire done;
+    wire sending;
+    reg reset;
+    reg received;
+    wire reading;
+ 
     integer file;
-    wire id;
 
     //Instantiate decoder module
     decoder dec (
         .clk(clk),
         .rd(rd),
-        .dn(dn),
-        .dat_in(dat_in),
-        .dat_out(dat_out),
-        .finish(finish),
-        .wt(wt),
-        .sent(sent),
-        .id(id)
+        .data_in(data_in),
+        .data_out(data_out),
+        .done(done),
+        .sending(sending),
+        .reset(reset),
+        .received(received),
+        .reading(reading)
     );
 
     reg [31:0] fdata_out;
@@ -46,7 +47,7 @@ module decoder_tb;
         $display("Starting...");
 
         // opening file in read mode:
-        fdata_in = $fopen("data_in.txt", "r");
+        fdata_in = $fopen("encoded_bitstream.txt", "r");
         #5;
 
         // Check if file opened successfully
@@ -63,10 +64,10 @@ module decoder_tb;
     end
 
     always @(posedge clk) begin
-        if((dn == 0)&&(id==0)) begin
-            sent = 0;
-            rd=0;
-            status = $fscanf(fdata_in, "%b", dat_in);
+        if(done != 1) begin
+            $display("reading file...");
+            rd = 0;
+            status = $fscanf(fdata_in, "%b", data_in);
 
             // Check if read was successful
             if (status == 0) begin
@@ -74,29 +75,29 @@ module decoder_tb;
                 $finish;
             end
 
-            $display("Data in: %b", dat_in);
+            $display("Data in: %b", data_in);
             i=i+1;
             rd = 1;
-            wait(wt);
-            rd = 0;
+            wait(reading);
         end
-        else begin
-            //writing output data to txt
-            if ((dn == 1)&&(finish == 0)) begin
-                sent = 0;
-                $fwrite(fdata_out, "%b\n", dat_out);
-                $display("Data out: %b",dat_out);
-                sent = 1;
-                end
+    end
+      always @(posedge clk) begin
+        received <= 0;
+        //writing output data to txt
+        if (done == 0 && sending == 1) begin
+            $fwrite(fdata_out, "%b\n", data_out);
+            $display("Data out: %b\n",data_out);
+            received <= 1;
+            end
 
-            else if ((dn == 1)&&(finish == 1)) begin
-                // close the output file
-                $display("Done.");
-                $fclose(fdata_out);
-                $fclose(fdata_in);
-                $finish;
-            end
-            end
+        if (done == 1) begin
+            // close the output file
+            $display("Done.");
+            $fclose(fdata_out);
+            $fclose(fdata_in);
+            $finish;
         end
+    end
+
     
 endmodule
