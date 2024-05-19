@@ -1,3 +1,4 @@
+// Decoder Version 1: Sequential 
 // Test bench simulator for YODA decoder
 // 2 bytes stored, metadata tells us that
 // set simulation time:

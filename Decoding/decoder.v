@@ -1,7 +1,8 @@
+// Decoder Testbench Version 1: Sequential Implementation
 `timescale 1ns/1ps
 module decoder (clk, rd, dat_in, dat_out, dn, finish, wt, sent, id);
     input clk;
-    input rd; //start reading from C
+    input rd; //start READ state, from tb
     input [7:0] dat_in; //read in 1 byte at a time
     input sent; //controller command to start read mode
 
@@ -42,8 +43,8 @@ module decoder (clk, rd, dat_in, dat_out, dn, finish, wt, sent, id);
                     wt = 0;
                     // read in latest data in value
                     buffer[tail] = dat_in;
-                    // $display("Data in decoder mod buffer[%b]: %b", tail, buffer[tail]);
-                    tail = (tail + 1); //% 4;
+                    $display("Data in decoder mod buffer[%b]: %b", tail, buffer[tail]);
+                    tail = (tail + 1); 
                     wt=1;
                     #10;
  
@@ -65,8 +66,7 @@ module decoder (clk, rd, dat_in, dat_out, dn, finish, wt, sent, id);
                     default: begin
                         ext = { buffer[0][1:0], buffer[1][1:0], buffer[2][1:0], buffer[3][1:0] };
                         state = SEND;
-                        $display("Processing done.");
-                        // $finish;
+                        //$display("Processing done.");
                     end
                 endcase
                 
