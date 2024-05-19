@@ -59,7 +59,7 @@ def decoding(encoded_image, LSB_encoding_depth):
     # Convert audio length from binary to decimal 
     audio_length = int(audio_length_bitstream, 2)
 
-    # Cycle throught the image and extract the secret audio until the number of extracted bits correspons to the audio length
+    # Cycle through the image and extract the secret audio until the number of extracted bits corresponds to the audio length
     decoded_audio_bitstream = ''
     iterations = ((audio_length + 24)//LSB_encoding_depth)
     remainder = ((audio_length + 24) %LSB_encoding_depth)
