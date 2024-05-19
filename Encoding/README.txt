@@ -1,4 +1,4 @@
-This folder contains everything needed to encode and image with a secret message and to decode the message using Python.
+This folder contains everything needed to encode an image with a secret message and to decode the message using Python.
 
 Contains:
 1. babyyoda.png: The image that can be encoded
